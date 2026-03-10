@@ -21,17 +21,18 @@ app.post("/api/generate", async (req, res) => {
     return;
   }
 
-  const { country, context, nativeScript = false } = req.body as {
+  const { country, context, nativeScript = false, personal } = req.body as {
     country?: string;
     context?: string;
     nativeScript?: boolean;
+    personal?: string;
   };
 
   const groq = new Groq({ apiKey });
 
   const prompt = context
-    ? buildContextPrompt(context, nativeScript)
-    : buildCountryPrompt(country ?? "Japan", nativeScript);
+    ? buildContextPrompt(context, nativeScript, personal)
+    : buildCountryPrompt(country ?? "Japan", nativeScript, personal);
 
   try {
     const completion = await groq.chat.completions.create({
@@ -89,14 +90,14 @@ function pickRandomTheme(): string {
   return NICKNAME_THEMES[index];
 }
 
-function buildContextPrompt(context: string, nativeScript: boolean): string {
+function buildContextPrompt(context: string, nativeScript: boolean, personal?: string): string {
   const theme = pickRandomTheme();
 
   return `You are a creative gaming nickname generator with a strong lean toward the "${theme}" universe.
 
 Generate exactly 12 unique gaming nicknames based on the following context:
 ${context}
-
+${personal ? `\nPersonal twist: The user provided the word/name "${personal}". Incorporate or riff on it in at least 3–4 of the nicknames — blend it with the context, mutate it, combine it with other words, or use it as a root.\n` : ""}
 Style rules:
 - Heavily draw inspiration from the "${theme}" theme — references, terminology, characters, or vibes from that world
 - Mix styles: some cool/intimidating, some funny/ironic, some memorable
@@ -109,14 +110,14 @@ ${nativeScript ? "- Write nicknames using the native script relevant to this con
 Return ONLY a JSON array of strings, nothing else. Example: ["N1ghtW0lf", "5hadowByte"]`;
 }
 
-function buildCountryPrompt(country: string, nativeScript: boolean): string {
+function buildCountryPrompt(country: string, nativeScript: boolean, personal?: string): string {
   const isAzerbaijan = country.toLowerCase().includes("azerbaijan");
   const theme = pickRandomTheme();
 
   return `You are a creative gaming nickname generator deeply familiar with ${country}'s culture, with a strong lean toward the "${theme}" universe this session.
 
 Generate exactly 12 unique gaming nicknames inspired by ${country}.
-
+${personal ? `\nPersonal twist: The user provided the word/name "${personal}". Incorporate or riff on it in at least 3–4 of the nicknames — blend it with the country's culture, mutate it, combine it with local words, or use it as a creative root.\n` : ""}
 Draw from any of these cultural layers:
 - Local internet memes, viral moments, and online slang
 - Pop culture: movies, music artists, TV shows, anime, sports legends

@@ -11,6 +11,7 @@ export default function NicknameGenerator({ country, context }: Props) {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [copiedIndex, setCopiedIndex] = useState<number | null>(null);
+  const [personal, setPersonal] = useState("");
 
   async function generate() {
     setLoading(true);
@@ -18,8 +19,8 @@ export default function NicknameGenerator({ country, context }: Props) {
 
     try {
       const body = context
-        ? { context }
-        : { country: country ?? "Japan" };
+        ? { context, personal: personal.trim() || undefined }
+        : { country: country ?? "Japan", personal: personal.trim() || undefined };
 
       const res = await fetch("/api/generate", {
         method: "POST",
@@ -27,10 +28,26 @@ export default function NicknameGenerator({ country, context }: Props) {
         body: JSON.stringify(body),
       });
 
-      const data = await res.json();
+      const raw = await res.text();
 
       if (!res.ok) {
-        throw new Error(data.error ?? `Server error ${res.status}`);
+        let message = `Server error ${res.status}`;
+        try {
+          const errData = JSON.parse(raw);
+          if (errData.error) message = errData.error;
+        } catch { /* raw wasn't JSON, keep the default message */ }
+        throw new Error(message);
+      }
+
+      if (!raw) {
+        throw new Error("Server returned an empty response");
+      }
+
+      let data: { nicknames?: unknown };
+      try {
+        data = JSON.parse(raw);
+      } catch {
+        throw new Error(`Unexpected response from server: ${raw.slice(0, 120)}`);
       }
 
       if (!Array.isArray(data.nicknames)) {
@@ -54,6 +71,18 @@ export default function NicknameGenerator({ country, context }: Props) {
 
   return (
     <div>
+      <div className="mb-4">
+        <input
+          type="text"
+          value={personal}
+          onChange={(e) => setPersonal(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && !loading && generate()}
+          maxLength={40}
+          placeholder="Your name, word, or vibe (optional)"
+          className="w-full rounded-xl border border-zinc-800 bg-zinc-900 px-4 py-3 text-white placeholder-zinc-500 outline-none transition focus:border-violet-500/60 focus:ring-2 focus:ring-violet-500/20 md:w-96"
+        />
+      </div>
+
       <button
         onClick={generate}
         disabled={loading}
