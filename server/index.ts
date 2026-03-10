@@ -102,10 +102,11 @@ Style rules:
 - Mix styles: some cool/intimidating, some funny/ironic, some memorable
 - Single word or CamelCase compound — NO spaces in any nickname
 - Use clever wordplay, references, or thematic elements that fit the context
+- For roughly 3–4 of the 12 nicknames, apply leet-speak substitutions to some letters (e.g. A→4, E→3, S→5, O→0, I→1, T→7) — mix it naturally, not every letter
 ${nativeScript ? "- Write nicknames using the native script relevant to this context (e.g. Arabic letters, Cyrillic, Kanji, Hangul, etc.) where appropriate" : "- Use Latin letters only"}
 - No explanations
 
-Return ONLY a JSON array of strings, nothing else. Example: ["NightWolf", "ShadowByte"]`;
+Return ONLY a JSON array of strings, nothing else. Example: ["N1ghtW0lf", "5hadowByte"]`;
 }
 
 function buildCountryPrompt(country: string, nativeScript: boolean): string {
@@ -129,10 +130,11 @@ Style rules:
 - Single word or CamelCase compound — NO spaces in any nickname
 ${nativeScript ? `- Write nicknames using the native script of ${country} (e.g. Arabic letters for Arabic, Cyrillic for Russian, Kanji/Kana for Japanese, Hangul for Korean, etc.)` : "- Use romanized Latin letters"}
 - No generic English-only nicknames — make them feel like they could only come from ${country}
+- For roughly 3–4 of the 12 nicknames, apply leet-speak substitutions to some letters (e.g. A→4, E→3, S→5, O→0, I→1, T→7) — mix it naturally, not every letter
 - No explanations
 ${isAzerbaijan ? "- Do NOT reference Karabakh, Qarabağ, Nagorno-Karabakh, or any related territory, conflict, or imagery" : ""}
 
-Return ONLY a JSON array of strings, nothing else. Example: ["NightWolf", "ShadowByte"]`;
+Return ONLY a JSON array of strings, nothing else. Example: ["N1ghtW0lf", "5hadowByte"]`;
 }
 
 app.listen(PORT, () => {
