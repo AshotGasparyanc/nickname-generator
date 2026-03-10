@@ -61,13 +61,44 @@ app.post("/api/generate", async (req, res) => {
   }
 });
 
+const NICKNAME_THEMES = [
+  "anime",
+  "politics",
+  "history",
+  "cartoon",
+  "criminal",
+  "medicine",
+  "gaming",
+  "fantasy",
+  "cultural",
+  "mythology",
+  "technologies",
+  "science",
+  "crazy",
+  "legends",
+  "youtube",
+  "memes",
+  "reddit",
+  "tiktok",
+  "adult",
+  "sports",
+];
+
+function pickRandomTheme(): string {
+  const index = Math.floor(Math.random() * NICKNAME_THEMES.length);
+  return NICKNAME_THEMES[index];
+}
+
 function buildContextPrompt(context: string, nativeScript: boolean): string {
-  return `You are a creative gaming nickname generator.
+  const theme = pickRandomTheme();
+
+  return `You are a creative gaming nickname generator with a strong lean toward the "${theme}" universe.
 
 Generate exactly 12 unique gaming nicknames based on the following context:
 ${context}
 
 Style rules:
+- Heavily draw inspiration from the "${theme}" theme — references, terminology, characters, or vibes from that world
 - Mix styles: some cool/intimidating, some funny/ironic, some memorable
 - Single word or CamelCase compound — NO spaces in any nickname
 - Use clever wordplay, references, or thematic elements that fit the context
@@ -79,8 +110,9 @@ Return ONLY a JSON array of strings, nothing else. Example: ["NightWolf", "Shado
 
 function buildCountryPrompt(country: string, nativeScript: boolean): string {
   const isAzerbaijan = country.toLowerCase().includes("azerbaijan");
+  const theme = pickRandomTheme();
 
-  return `You are a creative gaming nickname generator deeply familiar with ${country}'s culture.
+  return `You are a creative gaming nickname generator deeply familiar with ${country}'s culture, with a strong lean toward the "${theme}" universe this session.
 
 Generate exactly 12 unique gaming nicknames inspired by ${country}.
 
@@ -90,6 +122,7 @@ Draw from any of these cultural layers:
 - History, mythology, folklore, and national symbols
 - Street slang, regional expressions, or phonetic quirks of the local language
 - Famous local foods, places, or anything iconic to ${country}
+- Blend the above with the "${theme}" theme for unexpected, creative combinations
 
 Style rules:
 - Mix styles: some cool/intimidating, some funny/ironic, some nostalgic, some hyper-local
